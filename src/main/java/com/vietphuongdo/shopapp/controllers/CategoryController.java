@@ -44,10 +44,10 @@ public class CategoryController {
         return ResponseEntity.ok(categories);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<String> updateCategory(@PathVariable Long id,@Valid @RequestBody CategoryDTO categoryDTO) {
-        categoryService.updateCategory(id,categoryDTO);
-        return ResponseEntity.ok("Update category successfully with id: "+id);
+    @PutMapping("/{categoryId}")
+    public ResponseEntity<String> updateCategory(@PathVariable Long categoryId,@Valid @RequestBody CategoryDTO categoryDTO) {
+        categoryService.updateCategory(categoryId,categoryDTO);
+        return ResponseEntity.ok("Update category successfully with id: "+categoryId);
     }
 
     @DeleteMapping("/{id}")
