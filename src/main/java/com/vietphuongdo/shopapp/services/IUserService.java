@@ -6,5 +6,5 @@ import com.vietphuongdo.shopapp.exception.DataNotFoundException;
 
 public interface IUserService {
     User createUser(UserDTO userDTO) throws DataNotFoundException;
-    String login(String phoneNumber,String password);
+    String login(String phoneNumber,String password) throws Exception;
 }

@@ -48,8 +48,14 @@ public class UserController {
     public ResponseEntity<String> login(
             @Valid @RequestBody UserLoginDTO userLoginDTO) {
         //check login and create token
-        String token = userService.login(userLoginDTO.getPhoneNumber(), userLoginDTO.getPassword());
-        //Respond token in response
-        return ResponseEntity.ok(token);
+        try {
+            //Respond token in response
+            String token = userService.login(userLoginDTO.getPhoneNumber(), userLoginDTO.getPassword());
+            return ResponseEntity.ok(token);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+
     }
 }
