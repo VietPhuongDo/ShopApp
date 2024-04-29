@@ -2,6 +2,7 @@ package com.vietphuongdo.shopapp.controllers;
 
 import com.vietphuongdo.shopapp.dtos.UserDTO;
 import com.vietphuongdo.shopapp.dtos.UserLoginDTO;
+import com.vietphuongdo.shopapp.entities.User;
 import com.vietphuongdo.shopapp.services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class UserController {
             @Valid @RequestBody UserDTO userDTO,
             BindingResult result
     ) {
+        //no register for admin,only for user
         try {
             if (result.hasErrors()) {
                 List<String> errorMessages = result.getFieldErrors()
@@ -37,8 +39,8 @@ public class UserController {
             if (!userDTO.getPassword().equals(userDTO.getRetypePassword())) {
                 return ResponseEntity.badRequest().body("Password does not match");
             }
-            userService.createUser(userDTO);
-            return ResponseEntity.ok("Register successfully");
+            User user = userService.createUser(userDTO);
+            return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

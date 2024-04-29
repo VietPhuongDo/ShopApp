@@ -5,6 +5,7 @@ import com.vietphuongdo.shopapp.dtos.UserDTO;
 import com.vietphuongdo.shopapp.entities.Role;
 import com.vietphuongdo.shopapp.entities.User;
 import com.vietphuongdo.shopapp.exception.DataNotFoundException;
+import com.vietphuongdo.shopapp.exception.PermissionDeniedException;
 import com.vietphuongdo.shopapp.repositories.RoleRepository;
 import com.vietphuongdo.shopapp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +28,15 @@ public class UserService implements IUserService {
     private final AuthenticationManager authenticationManager;
 
     @Override
-    public User createUser(UserDTO userDTO) throws DataNotFoundException {
+    public User createUser(UserDTO userDTO) throws Exception {
         String phoneNumber = userDTO.getPhoneNumber();
         if (userRepository.existsByPhoneNumber(phoneNumber)){
             throw new DataIntegrityViolationException("Phone number already exists");
+        }
+        Role role = roleRepository.findById(userDTO.getRoleId())
+                .orElseThrow(() -> new DataNotFoundException("Role not found"));
+        if(role.getName().equals(Role.ADMIN)){
+            throw new PermissionDeniedException("You cannot register admin account");
         }
         //convert UserDTO -> User
         User newUser = User.builder()
@@ -42,8 +48,6 @@ public class UserService implements IUserService {
                 .facebookAccountId(userDTO.getFacebookAccountId())
                 .googleAccountId(userDTO.getGoogleAccountId())
                 .build();
-        Role role = roleRepository.findById(userDTO.getRoleId())
-                .orElseThrow(() -> new DataNotFoundException("Role not found"));
         newUser.setRole(role);
         //fb and gg not have password
         if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() == 0){
