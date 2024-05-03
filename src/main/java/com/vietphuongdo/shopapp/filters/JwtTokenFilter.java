@@ -1,6 +1,6 @@
 package com.vietphuongdo.shopapp.filters;
 
-import com.vietphuongdo.shopapp.components.JwtTokenUtil;
+import com.vietphuongdo.shopapp.components.JwtTokenUtils;
 import com.vietphuongdo.shopapp.entities.User;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -24,11 +24,11 @@ import java.util.List;
 //eyJhbGciOiJIUzI1NiJ9.eyJwaG9uZU51bWJlciI6IjAxMjQ1Njg3OCIsInN1YiI6IjAxMjQ1Njg3OCIsImV4cCI6MTcxNjk0MjM3OX0.KboM2t1EIS8XF5WuLrgPdd56uP4DC4LEce5gKQwUN7c
 @Component
 @RequiredArgsConstructor
-public class JwtTokenFilter extends OncePerRequestFilter {
+public class JwtTokenFilter extends OncePerRequestFilter{
     @Value("${api.prefix}")
     private String apiPrefix;
     private final UserDetailsService userDetailsService;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtils jwtTokenUtil;
     @Override
     protected void doFilterInternal(@NonNull  HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
@@ -67,7 +67,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     }
     private boolean isBypassToken(@NonNull  HttpServletRequest request) {
+
         final List<Pair<String, String>> bypassTokens = Arrays.asList(
+                Pair.of(String.format("%s/roles", apiPrefix), "GET"),
                 Pair.of(String.format("%s/products", apiPrefix), "GET"),
                 Pair.of(String.format("%s/categories", apiPrefix), "GET"),
                 Pair.of(String.format("%s/users/register", apiPrefix), "POST"),
