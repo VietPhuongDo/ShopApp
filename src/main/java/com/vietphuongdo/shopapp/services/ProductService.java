@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,9 +47,16 @@ public class ProductService implements IProductService{
 
     @Override
     public Product getProductById(long productId) throws Exception {
-        return productRepository.findById(productId).
-                orElseThrow(()-> new DataNotFoundException(
-                        "Cannot find product with id ="+productId));
+        Optional<Product> optionalProduct = productRepository.getDetailProduct(productId);
+        if(optionalProduct.isPresent()){
+            return optionalProduct.get();
+        }
+        throw new DataNotFoundException("Cannot find product with Id ="+ productId);
+    }
+
+    @Override
+    public List<Product> findProductByIds(List<Long> productIds) {
+        return productRepository.findProductByIds(productIds);
     }
 
     @Override
@@ -117,4 +125,6 @@ public class ProductService implements IProductService{
         }
         return productImageRepository.save(newProductImage);
     }
+
+
 }

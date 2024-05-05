@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import com.vietphuongdo.shopapp.components.LocalizationUtils;
 import com.vietphuongdo.shopapp.dtos.ProductDTO;
 import com.vietphuongdo.shopapp.dtos.ProductImageDTO;
+
 import com.vietphuongdo.shopapp.entities.Product;
 import com.vietphuongdo.shopapp.entities.ProductImage;
 import com.vietphuongdo.shopapp.exception.DataNotFoundException;
@@ -30,10 +31,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${api.prefix}/products")
@@ -193,6 +192,22 @@ public class ProductController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
+    }
+
+    @GetMapping("/by-ids")
+    public ResponseEntity<?> getProductByIds(
+            @RequestParam("ids") String ids
+    ) {
+        try{
+            List<Long> productIds = Arrays.stream(ids.split(","))
+                    .map(Long::parseLong)
+                    .toList();
+            List<Product> products = productService.findProductByIds(productIds);
+            return ResponseEntity.ok(products);
+        }
+        catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     //delete a product
