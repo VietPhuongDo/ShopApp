@@ -136,16 +136,14 @@ public class ProductController {
             throw new IOException("Invalid file format");
         }
         String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        // Thêm UUID vào trước tên file để đảm bảo tên file là duy nhất
+        // add UUID -> unique file name
         String uniqueFilename = UUID.randomUUID().toString() + " _" + filename;
         java.nio.file.Path uploadDir = Paths.get("uploads");
-        // Kiểm tra và tạo thư mục nếu nó không tồn tại
         if (!Files.exists(uploadDir)) {
             Files.createDirectories(uploadDir);
         }
-        // Đường dẫn đầy đủ đến file
         java.nio.file.Path destination = Paths.get(uploadDir.toString(), uniqueFilename);
-        // Sao chép file vào thư mục đích
+        // copy to end folder
         Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
         return uniqueFilename;
     }
@@ -198,6 +196,7 @@ public class ProductController {
     public ResponseEntity<?> getProductByIds(
             @RequestParam("ids") String ids
     ) {
+        //string -> array,hash by ","
         try{
             List<Long> productIds = Arrays.stream(ids.split(","))
                     .map(Long::parseLong)

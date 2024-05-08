@@ -98,9 +98,25 @@ public class UserService implements IUserService{
                 existingUser.getAuthorities()
         );
 
-        //authenticate with Java Spring security
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtil.generateToken(existingUser);
+    }
+
+    @Override
+    public User getUserDetailsFromToken(String token) throws Exception {
+        if(jwtTokenUtil.isTokenExpired(token)){
+            throw new Exception("Token expired");
+        }
+        //find phone number from claims in token
+        String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
+        Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
+
+        if(optionalUser.isPresent()) {
+            return optionalUser.get();
+        }
+        else {
+            throw new Exception("User not found");
+        }
     }
 }
 

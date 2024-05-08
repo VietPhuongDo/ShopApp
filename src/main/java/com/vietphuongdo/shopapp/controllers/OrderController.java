@@ -4,6 +4,7 @@ package com.vietphuongdo.shopapp.controllers;
 import com.vietphuongdo.shopapp.components.LocalizationUtils;
 import com.vietphuongdo.shopapp.dtos.OrderDTO;
 import com.vietphuongdo.shopapp.entities.Order;
+import com.vietphuongdo.shopapp.responses.OrderResponse;
 import com.vietphuongdo.shopapp.services.OrderService;
 import com.vietphuongdo.shopapp.utils.MessageKeys;
 import jakarta.validation.Valid;
@@ -24,19 +25,19 @@ public class OrderController {
 
     @PostMapping("")
     //POST request http://localhost:8088/api/v1/orders
-    public ResponseEntity<?> createOrder(@RequestBody @Valid OrderDTO orderDTO, BindingResult bindingResult) {
+    public ResponseEntity<?> createOrder(@RequestBody @Valid OrderDTO orderDTO, BindingResult result) {
         try {
-            if (bindingResult.hasErrors()) {
-                List<String> errors = bindingResult.getFieldErrors()
+            if(result.hasErrors()) {
+                List<String> errorMessages = result.getFieldErrors()
                         .stream()
                         .map(FieldError::getDefaultMessage)
                         .toList();
-                return ResponseEntity.badRequest().body(errors);
+                return ResponseEntity.badRequest().body(errorMessages);
             }
             Order orderResponse = orderService.createOrder(orderDTO);
             return ResponseEntity.ok(orderResponse);
         } catch (Exception e) {
-             return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -57,7 +58,7 @@ public class OrderController {
     public ResponseEntity<?> getOrder(@Valid @PathVariable("orderId") Long orderId) {
         try {
             Order existingOrder = orderService.getOrder(orderId);
-            return ResponseEntity.ok(existingOrder);
+            return ResponseEntity.ok(OrderResponse.fromOrder(existingOrder));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

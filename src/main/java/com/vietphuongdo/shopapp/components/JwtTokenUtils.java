@@ -32,7 +32,9 @@ public class JwtTokenUtils {
         //claims = properties of user which add to security
         Map<String,Object> claims = new HashMap<>();
 //        this.generateSecretKey();
+        //claims == properties of jwt token
         claims.put("phoneNumber",user.getPhoneNumber());
+        claims.put("userId",user.getId());
         try{
             String token = Jwts.builder()
                     .setClaims(claims)
