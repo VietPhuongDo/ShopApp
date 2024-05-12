@@ -1,5 +1,6 @@
 package com.vietphuongdo.shopapp.controllers;
 
+import com.vietphuongdo.shopapp.dtos.UpdateUserDTO;
 import com.vietphuongdo.shopapp.dtos.UserDTO;
 import com.vietphuongdo.shopapp.dtos.UserLoginDTO;
 import com.vietphuongdo.shopapp.entities.User;
@@ -11,12 +12,14 @@ import com.vietphuongdo.shopapp.components.LocalizationUtils;
 import com.vietphuongdo.shopapp.utils.MessageKeys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("${api.prefix}/users")
@@ -81,6 +84,26 @@ public class UserController {
                             .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_FAILED, e.getMessage()))
                             .build()
             );
+        }
+    }
+
+    @PutMapping("/details/{userId}")
+    public ResponseEntity<UserResponse> updateUserDetails(
+            @PathVariable Long userId,
+            @RequestBody UpdateUserDTO updatedUserDTO,
+            @RequestHeader("Authorization") String authorizationHeader
+    ) {
+        try {
+            String extractedToken = authorizationHeader.substring(7);
+            User user = userService.getUserDetailsFromToken(extractedToken);
+            // Ensure that the user making the request matches the user being updated
+            if (!Objects.equals(user.getId(), userId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            User updatedUser = userService.updateUser(userId, updatedUserDTO);
+            return ResponseEntity.ok(UserResponse.fromUser(updatedUser));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 
